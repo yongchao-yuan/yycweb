@@ -1,24 +1,9 @@
 import streamlit as st
 import time
 import os
-from PIL import Image
-import urllib.request
 import akshare as ak
 import numpy as np
 import pandas as pd
-
-
-def convert_gif2jpg(gif_name, jpg_name):
-    # 打开gif图像
-    gif_image = Image.open(gif_name)
-    image = gif_image.convert('RGB')
-    image.save(jpg_name)
-
-
-def open_url_pic(url, jpg_name):
-    # 打开gif图像
-    response = urllib.request.urlopen(url)
-    image = np.asarray(bytearray(response.read()), dtype="uint8")
 
 
 st.set_page_config(page_title="Shares Trend", page_icon="📈")

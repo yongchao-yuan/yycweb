@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import time
 import os
-import akshare as ak
 from datetime import datetime
 from openpyxl import load_workbook
 
@@ -33,21 +32,22 @@ if save_button:
     with pd.ExcelWriter(pd_diary) as writer:
         rows = df_diary.shape[0]
         df1.to_excel(writer, index=False,
-                     header=rows == 0, startrow=rows, startcol=0)
+                     header=(rows==0), startrow=rows, startcol=0)
     st.success("saved!")
 
 inq_button = st.button('inquery')
 
-if inq_button:
+if inq_button and os.path.isfile(pd_diary):
     df2 = pd.read_excel(pd_diary)
-    t_date = t_date.strip()
-    t_title = t_title.strip()
-    t_content = t_content.strip()
-    if len(t_date) > 0:
-        df2 = df2.loc[df2['date'].str.contains(t_date)]
-    if len(t_title) > 0:
-        df2 = df2.loc[df2['title'].str.contains(t_title)]
-    if len(t_content) > 0:
-        df2 = df2.loc[df2['content'].str.contains(t_content)]
+    if df2.shape[0] > 0:
+        t_date = t_date.strip()
+        t_title = t_title.strip()
+        t_content = t_content.strip()
+        if len(t_date) > 0:
+            df2 = df2.loc[df2['date'].str.contains(t_date)]
+        if len(t_title) > 0:
+            df2 = df2.loc[df2['title'].str.contains(t_title)]
+        if len(t_content) > 0:
+            df2 = df2.loc[df2['content'].str.contains(t_content)]
     f"inquery retrive {df2.shape[0]} results"
     df2

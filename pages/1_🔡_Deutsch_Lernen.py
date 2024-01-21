@@ -16,8 +16,14 @@ def bd_get_word_sound(text, lan='de'):
     lan : uk or en uk英音 en美音, de德语, jp日语, zh中文
     """
     spd = '2'  # default is 3 数字越小越慢
-    urllib.request.urlretrieve("https://fanyi.baidu.com/gettts?lan=" +
-                               lan+"&text="+text+"&spd="+spd+"&source=web", "sounds/"+text+".mp3")
+
+    # 单词如果不是ascii会报错，必须使用quote转成%BB这种
+    url = "https://fanyi.baidu.com/gettts?lan="+lan+"&text="\
+        + urllib.parse.quote(text, safe=':/')+"&spd="+spd+"&source=web"
+    urllib.request.urlretrieve(url, "sounds/"+text+".mp3")
+
+    # urllib.request.urlretrieve("https://fanyi.baidu.com/gettts?lan=" +
+    #                            lan+"&text="+text+"&spd="+spd+"&source=web", "sounds/"+text+".mp3")
 
 
 def bd_trans(query, fromlang="zh", tolang="de"):
@@ -117,10 +123,11 @@ if submit_button:
     my_slot.text(zstr)
     if len(word.split()) <= 1:
         ret = search_word(word)
+        snd_fname = f"{word}.mp3"
+        snd_pname = f"sounds/{snd_fname}"
         if len(ret) == 0:
-            bd_get_word_sound(word, lan='de')
             newdata = {'Deutsch': [word], 'Chinesisch': [zstr],
-                       'Aussprache': [f"{word}.mp3"], 'Frequenz': [1]}
+                       'Aussprache': [snd_fname], 'Frequenz': [1]}
             newrow = pd.DataFrame(newdata)
             df = pd.concat([newrow, df], axis=0, ignore_index=True)
         else:
@@ -128,10 +135,13 @@ if submit_button:
             if row['Chinesisch'] == "":
                 row['Chinesisch'] = zstr
             if row['Aussprache'] == "":
-                row['Aussprache'] = f"{word}.mp3"
+                row['Aussprache'] = snd_fname
             row['Frequenz'] += 1
             df.loc[ret[0]] = row
-        st.audio(open(f"sounds/{word}.mp3", 'rb').read(), format='audio/mp3')
+        if os.path.isfile(snd_pname) == False or os.path.getsize(snd_pname) <= 1:
+            bd_get_word_sound(word, lan='de')
+
+        st.audio(open(snd_pname, 'rb').read(), format='audio/mp3')
         df.to_csv(pd_filename, index=False)
 
 df
