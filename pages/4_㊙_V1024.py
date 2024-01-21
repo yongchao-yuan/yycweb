@@ -12,6 +12,8 @@ st.sidebar.header("explore1024")
 st.write(
     """This page tranfer 1024 pages"""
 )
-url = 'https://t66y.com/index.php'
-st.write(
-    f'<iframe src="{url}" width="700" height="500"></iframe>', unsafe_allow_html=True)
+url = st.text_input('url:', "https://t66y.com/index.php")
+go_button = st.button('go')
+if go_button: 
+    st.write(
+        f'<iframe src="{url}" width="700" height="500"></iframe>', unsafe_allow_html=True)
